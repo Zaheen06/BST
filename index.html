@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tree Visualization</title>
+    <link rel="stylesheet" href="styles.css">
+    
+</head>
+<body>
+    <div class="container">
+        <h1>Tree Visualization</h1>
+        <div class="controls">
+            <select id="treeType">
+                <option value="bst">Binary Search Tree (BST)</option>
+                <option value="bt">Binary Tree (BT)</option>
+            </select>
+            <input type="number" id="nodeValue" placeholder="Enter node value">
+            <button onclick="addNode()">Add Node</button>
+            <button onclick="clearTree()">Clear Tree</button>
+        </div>
+        <div class="tree-container">
+            <canvas id="treeCanvas"></canvas>
+        </div>
+        <div class="traversal-results">
+            <p id="inorder">Inorder: </p>
+            <p id="preorder">Preorder: </p>
+            <p id="postorder">Postorder: </p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    
+</body>
+</html>
