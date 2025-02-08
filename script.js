@@ -34,7 +34,7 @@ function addNode() {
         return;
     }
 
-    if (containsValue(root, value)) {
+    if (root && containsValue(root, value)) {
         alert('Duplicate values are not allowed!');
         return;
     }
