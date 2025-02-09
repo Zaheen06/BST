@@ -3,32 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tree Visualization</title>
+    <title>Binary Search Tree Visualization</title>
     <link rel="stylesheet" href="styles.css">
-    
+
 </head>
 <body>
     <div class="container">
-        <h1>Tree Visualization</h1>
-        <div class="controls">
-            <select id="treeType">
-                <option value="bst">Binary Search Tree (BST)</option>
-                <option value="bt">Binary Tree (BT)</option>
-            </select>
-            <input type="number" id="nodeValue" placeholder="Enter node value">
-            <button onclick="addNode()">Add Node</button>
-            <button onclick="clearTree()">Clear Tree</button>
-        </div>
+        <h1>Binary Search Tree (BST) Visualization</h1>
+        <input type="number" id="nodeValue" placeholder="Enter node value">
+        <button onclick="addNode()">Add Node</button>
+        <button onclick="deleteNode()">Delete Node</button>
+        <button onclick="clearTree()">Clear Tree</button>
         <div class="tree-container">
             <canvas id="treeCanvas"></canvas>
         </div>
-        <div class="traversal-results">
-            <p id="inorder">Inorder: </p>
-            <p id="preorder">Preorder: </p>
-            <p id="postorder">Postorder: </p>
-        </div>
     </div>
-    <script src="script.js"></script>
-    
+
+    <script>
+        class Node {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+                this.x = 0;
+                this.y = 0;
+            }
+        }
+
+        let root = null;
+        let canvas = document.getElementById("treeCanvas");
+        let ctx = canvas.getContext("2d");
+        const nodeRadius = 20;
+
+        function initCanvas() {
+            canvas.width = document.querySelector(".tree-container").clientWidth - 20;
+            canvas.height = 400;
+            drawTree();
+        }
+
+        window.addEventListener("resize", initCanvas);
+        initCanvas();
+
+        document.getElementById("nodeValue").addEventListener("keypress", function (event) {
+            if (event.key === "Enter") {
+                addNode();
+            }
+        });
+
+        function addNode() {
+            const value = parseInt(document.getElementById("nodeValue").value);
+            if (isNaN(value)) {
+                alert("Please enter a valid number");
+                return;
+            }
+
+            root = insertBST(root, value);
+
+            document.getElementById("nodeValue").value = "";
+            drawTree();
+        }
+
+        function insertBST(node, value) {
+            if (!node) return new Node(value);
+
+            if (value < node.value) {
+                node.left = insertBST(node.left, value);
+            } else if (value > node.value) {
+                node.right = insertBST(node.right, value);
+            }
+            return node;
+        }
+
+        function deleteNode() {
+            const value = parseInt(document.getElementById("nodeValue").value);
+            if (isNaN(value)) {
+                alert("Please enter a valid number to delete");
+                return;
+            }
+
+            root = deleteBST(root, value);
+            document.getElementById("nodeValue").value = "";
+            drawTree();
+        }
+
+        function deleteBST(node, value) {
+            if (!node) return null;
+
+            if (value < node.value) {
+                node.left = deleteBST(node.left, value);
+            } else if (value > node.value) {
+                node.right = deleteBST(node.right, value);
+            } else {
+                if (!node.left) return node.right;
+                if (!node.right) return node.left;
+
+                let minNode = findMin(node.right);
+                node.value = minNode.value;
+                node.right = deleteBST(node.right, minNode.value);
+            }
+            return node;
+        }
+
+        function findMin(node) {
+            while (node.left) {
+                node = node.left;
+            }
+            return node;
+        }
+
+        function clearTree() {
+            root = null;
+            drawTree();
+        }
+
+        function calculatePositions(node, depth = 0, minX = 50, maxX = canvas.width - 50) {
+            if (!node) return;
+
+            node.x = (minX + maxX) / 2;
+            node.y = depth * 70 + 50;
+
+            calculatePositions(node.left, depth + 1, minX, node.x - 40);
+            calculatePositions(node.right, depth + 1, node.x + 40, maxX);
+        }
+
+        function drawTree() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (!root) return;
+
+            calculatePositions(root);
+            drawNode(root);
+        }
+
+        function drawNode(node) {
+            if (!node) return;
+
+            if (node.left) {
+                ctx.beginPath();
+                ctx.moveTo(node.x, node.y);
+                ctx.lineTo(node.left.x, node.left.y);
+                ctx.strokeStyle = "#666";
+                ctx.stroke();
+                drawNode(node.left);
+            }
+
+            if (node.right) {
+                ctx.beginPath();
+                ctx.moveTo(node.x, node.y);
+                ctx.lineTo(node.right.x, node.right.y);
+                ctx.strokeStyle = "#666";
+                ctx.stroke();
+                drawNode(node.right);
+            }
+
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, nodeRadius, 0, Math.PI * 2);
+            ctx.fillStyle = "#3498db";
+            ctx.fill();
+            ctx.strokeStyle = "#2980b9";
+            ctx.stroke();
+
+            ctx.fillStyle = "white";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.font = "14px Arial";
+            ctx.fillText(node.value, node.x, node.y);
+        }
+    </script>
 </body>
 </html>
